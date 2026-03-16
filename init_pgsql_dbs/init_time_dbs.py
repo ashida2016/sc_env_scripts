@@ -8,8 +8,8 @@ DB_PORT = "5432"
 SUPER_USER = "postgres"
 SUPER_PASS = "NhyCf2026^"
 
-NEW_ADMIN = "scteamleader"
-NEW_ADMIN_PASS = "Dfcf2026^"  # 你可以自行修改
+DB_LEADER = "scteamleader"
+DB_LEADER_PWD = "Dfcf2026^"  
 
 DB_PREFIX = "scdb_"
 DB_COUNT = 100
@@ -34,14 +34,14 @@ def init_system():
     cur = conn.cursor()
 
     # 1. 创建全局管理员角色 scteamleader
-    cur.execute(f"SELECT 1 FROM pg_roles WHERE rolname='{NEW_ADMIN}'")
+    cur.execute(f"SELECT 1 FROM pg_roles WHERE rolname='{DB_LEADER}'")
     if not cur.fetchone():
-        print(f"正在创建管理员账号: {NEW_ADMIN} ...")
+        print(f"正在创建管理员账号: {DB_LEADER} ...")
         # 赋予登录权限，并设置默认时区为上海
-        cur.execute(f"CREATE ROLE {NEW_ADMIN} WITH LOGIN PASSWORD '{NEW_ADMIN_PASS}';")
-        cur.execute(f"ALTER ROLE {NEW_ADMIN} SET timezone TO '{TIMEZONE}';")
+        cur.execute(f"CREATE ROLE {DB_LEADER} WITH LOGIN PASSWORD '{DB_LEADER_PWD}';")
+        cur.execute(f"ALTER ROLE {DB_LEADER} SET timezone TO '{TIMEZONE}';")
     else:
-        print(f"管理员账号 {NEW_ADMIN} 已存在，跳过创建。")
+        print(f"管理员账号 {DB_LEADER} 已存在，跳过创建。")
 
     # 获取已有的数据库列表，防止重复创建报错
     cur.execute("SELECT datname FROM pg_database WHERE datistemplate = false;")
@@ -54,7 +54,7 @@ def init_system():
         if dbname not in existing_dbs:
             print(f"正在创建数据库: {dbname} ...")
             # 指定 UTF8 编码以支持中文存储，并将所有权赋予 scteamleader
-            cur.execute(f"CREATE DATABASE {dbname} WITH OWNER {NEW_ADMIN} ENCODING 'UTF8';")
+            cur.execute(f"CREATE DATABASE {dbname} WITH OWNER {DB_LEADER} ENCODING 'UTF8';")
             
             # 强制设置数据库级别的时区为上海
             cur.execute(f"ALTER DATABASE {dbname} SET timezone TO '{TIMEZONE}';")
@@ -89,6 +89,6 @@ if __name__ == "__main__":
         init_system()
         init_timescaledb_extensions()
         print(f"\n[OK]所有 {DB_COUNT} 个时序数据库初始化完成！")
-        print(f"[OK]后续业务代码请使用账号: {NEW_ADMIN} 连接 PgBouncer ({DB_HOST}:{DB_PORT}) 来访问这些数据库。")
+        print(f"[OK]后续业务代码请使用账号: {DB_LEADER} 连接 PgBouncer ({DB_HOST}:{DB_PORT}) 来访问这些数据库。")
     except Exception as e:
         print(f"[NG]发生致命错误: {e}")

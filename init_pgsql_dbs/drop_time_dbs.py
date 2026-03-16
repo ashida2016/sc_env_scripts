@@ -12,8 +12,8 @@ SUPER_PASS = "NhyCf2026^"
 
 DB_PREFIX = "scdb_"
 
-NEW_ADMIN = "scteamleader"
-# NEW_ADMIN_PASS = "Dfcf2026^"  # 你可以自行修改
+DB_LEADER = "scteamleader"
+# DB_LEADER_PASS = "Dfcf2026^"  # 你可以自行修改
 
 TOTAL_DBS = 100
 
@@ -42,7 +42,7 @@ def drop_all_databases():
     for i in range(1, TOTAL_DBS + 1):
         db_name = f"{DB_PREFIX}{i:03d}"
         # 这里假设所有数据库都使用同一个管理员账号，如果每个库有不同的用户，请修改为对应的用户名
-        user_name = NEW_ADMIN  
+        user_name = DB_LEADER  
 
         try:
             # 1. 强制断开该数据库的所有现有连接 (重要！否则删库会卡死或报错)

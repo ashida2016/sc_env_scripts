@@ -12,6 +12,9 @@ SUPER_PASS = "NhyCf2026^"
 
 DB_PREFIX = "scdb_"
 
+DB_LEADER = "scteamleader"
+DB_LEADER_PWD = "Dfcf2026^"  
+
 TOTAL_DBS = 100
 DAYS_TO_MOCK = 30              # 模拟过去 30 天的数据
 
@@ -86,8 +89,8 @@ def run_test_data_insertion():
         try:
             conn = psycopg2.connect(
                 dbname=db_name,
-                user=SUPER_USER,
-                password=SUPER_PASS,
+                user=DB_LEADER,
+                password=DB_LEADER_PWD,
                 host=DB_HOST,
                 port=DB_PORT
             )
