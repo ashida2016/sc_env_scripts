@@ -1,0 +1,28 @@
+
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     ns1.home.lan. admin.home.lan. (
+                        2026031601         ; Serial
+                        604800         ; Refresh
+                        86400          ; Retry
+                        2419200        ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns1.home.lan.
+
+gateway         IN      A       192.168.1.1
+homesrv         IN      A       192.168.1.251
+ns1             IN      A       192.168.1.252
+openwrt         IN      A       192.168.1.254
+redis           IN      A       192.168.1.30
+mysql           IN      A       192.168.1.50
+pgsql           IN      A       192.168.1.70
+kafka           IN      A       192.168.1.80
+nginx           IN      A       192.168.1.66
+asusnote        IN      A       192.168.1.123
+dev2510         IN      A       192.168.1.133
+web0            IN      A       192.168.1.66
+web1            IN      A       192.168.1.66
+web2            IN      A       192.168.1.66

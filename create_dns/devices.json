@@ -1,0 +1,63 @@
+{
+    "domain": "home.lan",
+    "network_prefix": "192.168.1",
+    "dns_server_ip": "192.168.1.252",
+    "devices": [
+        {
+            "hostname": "gateway",
+            "ip": "192.168.1.1"
+        },
+        {
+            "hostname": "homesrv",
+            "ip": "192.168.1.251"
+        },
+        {
+            "hostname": "ns1",
+            "ip": "192.168.1.252"
+        },
+        {
+            "hostname": "openwrt",
+            "ip": "192.168.1.254"
+        },
+        {
+            "hostname": "redis",
+            "ip": "192.168.1.30"
+        },
+        {
+            "hostname": "mysql",
+            "ip": "192.168.1.50"
+        },
+        {
+            "hostname": "pgsql",
+            "ip": "192.168.1.70"
+        },
+        {
+            "hostname": "kafka",
+            "ip": "192.168.1.80"
+        },
+        {
+            "hostname": "nginx",
+            "ip": "192.168.1.66"
+        },
+        {
+            "hostname": "asusnote",
+            "ip": "192.168.1.123"
+        },
+        {
+            "hostname": "dev2510",
+            "ip": "192.168.1.133"
+        },        
+        {
+            "hostname": "web0",
+            "ip": "192.168.1.66"
+        },
+        {
+            "hostname": "web1",
+            "ip": "192.168.1.66"
+        },
+        {
+            "hostname": "web2",
+            "ip": "192.168.1.66"
+        }
+    ]
+}
