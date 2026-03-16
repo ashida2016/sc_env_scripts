@@ -1,6 +1,7 @@
 # sc_env_scripts
 创建环境的各种脚本
 
+# ---------------------------------------------------
 # 【Web0】配置 docker_test_webs\fastapi 的 conda 环境
 cd ./sc_env_scripts/docker_test_webs/fastapi
 conda create -n test_web0 python=3.12 -y
@@ -33,3 +34,10 @@ pip install -r requirements.txt
 python manage.py runserver 0.0.0.0:8182
 # 验证
 http://localhost:8182/
+
+# ---------------------------------------------------
+# init_pgsql_dbas 运行环境
+conda create -n init_pgsql_dbs python=3.12 -y
+conda activate init_pgsql_dbs
+pip install -r requirements.txt
+# 
