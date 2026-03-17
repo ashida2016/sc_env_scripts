@@ -1,5 +1,5 @@
 # sc_env_scripts
-创建环境的各种脚本
+创建、调试、测试 docker 环境的各种脚本
 
 # ---------------------------------------------------
 # 【Web0】配置 docker_test_webs\fastapi 的 conda 环境
@@ -40,4 +40,12 @@ http://localhost:8182/
 conda create -n init_pgsql_dbs python=3.12 -y
 conda activate init_pgsql_dbs
 pip install -r requirements.txt
-# 
+
+# ---------------------------------------------------
+# init_pgsql_dbs 工具集使用说明
+init_time_dbs.py    -> 创建 n 个时序数据库及每个库的 DBA
+mock_kline_data.py  -> 生成模拟的 K 线数据
+fix_indexes.py      -> 调整索引 ( Optional )
+test_pgbouncer.py   -> 并发压力测试
+drop_time_dbs.py    -> 删除 n 个时序数据库及每个库的 DBA
+# ---------------------------------------------------

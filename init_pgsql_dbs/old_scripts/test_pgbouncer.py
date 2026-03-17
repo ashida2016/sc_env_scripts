@@ -17,16 +17,19 @@ DB_COUNT = 100
 
 # --- 压测参数 ---
 # 并发线程数（模拟同时发起请求的客户端数量）
-CONCURRENCY = 1  
+CONCURRENCY = 300  
 # 总请求次数
-TOTAL_REQUESTS = 1  
+TOTAL_REQUESTS = 3000 
+
+TABLE_NAME = "stock_k_lines"  # 模拟数据表名
+TIME_COLUMN = "time"       # 表示时间的字段名，通常是 time 或 created_at
 
 # --- 查询语句配置 ---
 # 请将这里替换为你实际的 K 线表名和查询逻辑。
 # 这里模拟一个典型的时序查询：获取某只股票最近 100 条 K 线数据并按时间倒序
-TEST_QUERY = """
-    SELECT * FROM stock_k_lines 
-    ORDER BY time DESC 
+TEST_QUERY = f"""
+    SELECT * FROM {TABLE_NAME} 
+    ORDER BY {TIME_COLUMN} DESC 
     LIMIT 100;
 """
 # 如果你的表名不同，或者想先测纯连接性能，可以用这个代替：
@@ -95,7 +98,7 @@ def run_stress_test():
         completed = 0
         for future in as_completed(futures):
             completed += 1
-            if completed % 500 == 0:
+            if completed % int(TOTAL_REQUESTS/10) == 0:
                 print(f"进度: {completed} / {TOTAL_REQUESTS} 已完成...")
 
     end_wall_time = time.time()

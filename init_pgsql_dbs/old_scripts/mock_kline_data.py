@@ -15,8 +15,11 @@ DB_PREFIX = "scdb_"
 DB_LEADER = "scteamleader"
 DB_LEADER_PWD = "Dfcf2026^"  
 
+TABLE_NAME = "stock_k_lines"  # 模拟数据表名
+TIME_COLUMN = "time"       # 表示时间的字段名，通常是 time 或 created_at
+
 TOTAL_DBS = 100
-DAYS_TO_MOCK = 30              # 模拟过去 30 天的数据
+DAYS_TO_MOCK = 5000              # 模拟过去 n 天的数据
 
 # ============================================
 
@@ -61,9 +64,9 @@ def run_test_data_insertion():
     print(f">>> 准备在 {TOTAL_DBS} 个数据库中创建 K 线超表并写入 {DAYS_TO_MOCK} 天的测试数据...")
     
     # 建表与转换为超表的 SQL
-    create_table_sql = """
-    CREATE TABLE IF NOT EXISTS stock_k_lines (
-        time TIMESTAMPTZ NOT NULL,
+    create_table_sql = f"""
+    CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
+        {TIME_COLUMN} TIMESTAMPTZ NOT NULL,
         symbol VARCHAR(10) NOT NULL,
         open_price NUMERIC(10, 2),
         high_price NUMERIC(10, 2),
@@ -73,12 +76,12 @@ def run_test_data_insertion():
     );
     """
     # 转换为 TimescaleDB 超表 (按 time 字段进行时间分区)
-    create_hypertable_sql = """
-    SELECT create_hypertable('stock_k_lines', 'time', if_not_exists => TRUE);
+    create_hypertable_sql = f"""
+    SELECT create_hypertable('{TABLE_NAME}', '{TIME_COLUMN}', if_not_exists => TRUE);
     """
     
-    insert_sql = """
-    INSERT INTO stock_k_lines (time, symbol, open_price, high_price, low_price, close_price, volume)
+    insert_sql = f"""
+    INSERT INTO {TABLE_NAME} ({TIME_COLUMN}, symbol, open_price, high_price, low_price, close_price, volume)
     VALUES (%s, %s, %s, %s, %s, %s, %s);
     """
 

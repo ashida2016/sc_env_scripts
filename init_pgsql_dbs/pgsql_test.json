@@ -1,0 +1,18 @@
+{
+    "DB_HOST": "192.168.1.70",
+    "DB_PORT": "5432",
+    "SUPER_USER": "postgres",
+    "SUPER_PASS": "NhyCf2026^",
+    "DB_LEADER": "scteamleader",
+    "DB_LEADER_PWD": "Dfcf2026^",
+    "DB_PREFIX": "scdb_",
+    "DB_COUNT": 100,
+    "TIMEZONE": "Asia/Shanghai",
+    "PGBOUNCER_HOST": "192.168.1.71",
+    "PGBOUNCER_PORT": "5432",
+    "TABLE_NAME": "stock_k_lines",
+    "TIME_COLUMN": "time",
+    "DAYS_TO_MOCK": 5000,
+    "CONCURRENCY": 300,
+    "TOTAL_REQUESTS": 3000
+}
