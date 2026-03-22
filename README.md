@@ -35,16 +35,17 @@ python manage.py runserver 0.0.0.0:8182 <br>
 ### 验证
 http://localhost:8182/ <br>
 
-## init_pgsql_dbas 运行环境
+## 【init_pgsql_dbas】 运行环境
 conda create -n init_pgsql_dbs python=3.12 -y <br>
 conda activate init_pgsql_dbs <br>
 pip install -r requirements.txt <br>
 
-# ---------------------------------------------------
-# init_pgsql_dbs 工具集使用说明
+### init_pgsql_dbs 工具集使用说明
 init_time_dbs.py    -> 创建 n 个时序数据库及每个库的 DBA <br>
 mock_kline_data.py  -> 生成模拟的 K 线数据 <br>
 fix_indexes.py      -> 调整索引 ( Optional ) <br>
 test_pgbouncer.py   -> 并发压力测试 <br>
 drop_time_dbs.py    -> 删除 n 个时序数据库及每个库的 DBA <br>
-# ---------------------------------------------------
+
+tsdb_manager.py     -> 统合工具，直接运行带菜单 <br>
+

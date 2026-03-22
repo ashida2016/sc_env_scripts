@@ -4,7 +4,7 @@
 ;
 $TTL    604800
 @       IN      SOA     ns1.home.lan. admin.home.lan. (
-                        2026031601         ; Serial
+                        2026032101         ; Serial
                         604800         ; Refresh
                         86400          ; Retry
                         2419200        ; Expire
@@ -12,10 +12,10 @@ $TTL    604800
 ;
 @       IN      NS      ns1.home.lan.
 
+251             IN      PTR     ns1.home.lan.
 1               IN      PTR     gateway.home.lan.
 251             IN      PTR     homesrv.home.lan.
-252             IN      PTR     ns1.home.lan.
-254             IN      PTR     openwrt.home.lan.
+200             IN      PTR     openclash.home.lan.
 30              IN      PTR     redis.home.lan.
 50              IN      PTR     mysql.home.lan.
 70              IN      PTR     pgsql.home.lan.
@@ -23,6 +23,7 @@ $TTL    604800
 66              IN      PTR     nginx.home.lan.
 123             IN      PTR     asusnote.home.lan.
 133             IN      PTR     dev2510.home.lan.
+183             IN      PTR     amp.home.lan.
 66              IN      PTR     web0.home.lan.
 66              IN      PTR     web1.home.lan.
 66              IN      PTR     web2.home.lan.

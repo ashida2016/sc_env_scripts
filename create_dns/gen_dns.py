@@ -64,6 +64,16 @@ $TTL    604800
     print(f"[OK]成功！文件已生成至 {OUTPUT_DIR} 目录。")
     print(f"[OK]正向区域: db.{domain}")
     print(f"[OK]反向区域: db.{prefix}")
+    print("-----更新-------")
+    print("更新正向解析文件： sudo vi /etc/bind/zones/db.home.lan")
+    print("更新反向解析文件： sudo vi /etc/bind/zones/db.192.168.1")
+    print("-----检查-------")
+    print("检查配置文件格式（批量运行）： ")
+    print("sudo named-checkconf")
+    print("sudo named-checkzone home.lan /etc/bind/zones/db.home.lan")
+    print("sudo named-checkzone 1.168.192.in-addr.arpa /etc/bind/zones/db.192.168.1")
+    print("-----重启-------")
+    print("重启 BIND 服务： sudo systemctl restart named")
 
 if __name__ == "__main__":
     generate_zones()

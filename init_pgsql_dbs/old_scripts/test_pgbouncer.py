@@ -17,7 +17,7 @@ DB_COUNT = 100
 
 # --- 压测参数 ---
 # 并发线程数（模拟同时发起请求的客户端数量）
-CONCURRENCY = 300  
+CONCURRENCY = 50  
 # 总请求次数
 TOTAL_REQUESTS = 3000 
 

@@ -1,8 +1,12 @@
 {
     "domain": "home.lan",
     "network_prefix": "192.168.1",
-    "dns_server_ip": "192.168.1.252",
+    "dns_server_ip": "192.168.1.251",
     "devices": [
+        {
+            "hostname": "ns1",
+            "ip": "192.168.1.251"
+        },
         {
             "hostname": "gateway",
             "ip": "192.168.1.1"
@@ -12,12 +16,8 @@
             "ip": "192.168.1.251"
         },
         {
-            "hostname": "ns1",
-            "ip": "192.168.1.252"
-        },
-        {
-            "hostname": "openwrt",
-            "ip": "192.168.1.254"
+            "hostname": "openclash",
+            "ip": "192.168.1.200"
         },
         {
             "hostname": "redis",
@@ -47,6 +47,10 @@
             "hostname": "dev2510",
             "ip": "192.168.1.133"
         },        
+        {
+            "hostname": "amp",
+            "ip": "192.168.1.183"
+        },
         {
             "hostname": "web0",
             "ip": "192.168.1.66"
