@@ -4,7 +4,7 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import threading
 import time
 import random
-import sys,os
+import sys, os
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -20,8 +20,8 @@ class TSDBManager:
 
     # ================= 私有辅助方法 =================
     
-    def _get_super_conn(self, dbname="postgres"):
-        """获取超级管理员直连底层的连接 (用于 DDL 和删库操作)"""
+    def _get_super_conn(self, dbname="defaultdb"):
+        """获取超级管理员直连底层的连接 (注意: 默认库已改为 defaultdb)"""
         conn = psycopg2.connect(
             host=self.cfg["DB_HOST"],
             port=self.cfg["DB_PORT"],
@@ -78,24 +78,29 @@ class TSDBManager:
 
     def init_time_dbs(self):
         """功能 1: 初始化所有时序数据库及账号"""
-        print(">>> 正在连接主数据库初始化全局配置...")
+        print(f">>> 正在连接底层主数据库 ({self.cfg['DB_HOST']}) 初始化全局配置...")
         conn = self._get_super_conn()
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
 
         leader = self.cfg["DB_LEADER"]
-        cur.execute(f"SELECT 1 FROM pg_roles WHERE rolname='{leader}'")
-        if not cur.fetchone():
-            print(f">>> 正在创建管理员账号: {leader} ...")
-            cur.execute(f"CREATE ROLE {leader} WITH LOGIN PASSWORD '{self.cfg['DB_LEADER_PWD']}';")
-            cur.execute(f"ALTER ROLE {leader} SET timezone TO '{self.cfg['TIMEZONE']}';")
+        super_user = self.cfg["SUPER_USER"]
+        
+        # 仅当业务账号不同于超级账号时才创建，避免报错
+        if leader != super_user:
+            cur.execute(f"SELECT 1 FROM pg_roles WHERE rolname='{leader}'")
+            if not cur.fetchone():
+                print(f">>> 正在创建管理员账号: {leader} ...")
+                cur.execute(f"CREATE ROLE {leader} WITH LOGIN PASSWORD '{self.cfg['DB_LEADER_PWD']}';")
+                cur.execute(f"ALTER ROLE {leader} SET timezone TO '{self.cfg['TIMEZONE']}';")
         
         cur.execute("SELECT datname FROM pg_database WHERE datistemplate = false;")
         existing_dbs = [row[0] for row in cur.fetchall()]
 
         db_count = self.cfg["DB_COUNT"]
+        print(f">>> 开始创建 {db_count} 个数据库...")
         for i in range(1, db_count + 1):
-            dbname = f"{self.cfg['DB_PREFIX']}{i:03d}"
+            dbname = f"{self.cfg['DB_PREFIX']}{i}"
             if dbname not in existing_dbs:
                 cur.execute(f"CREATE DATABASE {dbname} WITH OWNER {leader} ENCODING 'UTF8';")
                 cur.execute(f"ALTER DATABASE {dbname} SET timezone TO '{self.cfg['TIMEZONE']}';")
@@ -104,7 +109,7 @@ class TSDBManager:
 
         print("\n>>> 开始为每个数据库安装 TimescaleDB 扩展...")
         for i in range(1, db_count + 1):
-            dbname = f"{self.cfg['DB_PREFIX']}{i:03d}"
+            dbname = f"{self.cfg['DB_PREFIX']}{i}"
             try:
                 conn = self._get_super_conn(dbname)
                 conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -142,8 +147,9 @@ class TSDBManager:
 
         success_count = 0
         for i in range(1, db_count + 1):
-            db_name = f"{self.cfg['DB_PREFIX']}{i:03d}"
+            db_name = f"{self.cfg['DB_PREFIX']}{i}"
             try:
+                # 灌库属于大批量直连写入操作，绕开 PgBouncer 直接写底层可以提升速度
                 conn = self._get_leader_conn(db_name, use_pgbouncer=False)
                 cursor = conn.cursor()
                 cursor.execute(create_table_sql)
@@ -170,11 +176,11 @@ class TSDBManager:
         table = self.cfg["TABLE_NAME"]
         time_col = self.cfg["TIME_COLUMN"]
         
-        print(f">>> 开始遍历 {db_count} 个数据库，确保转换为超表并建立倒排索引...")
+        print(f">>> 开始遍历 {db_count} 个数据库，确保建立倒排索引...")
         success_count = 0
 
         for i in range(1, db_count + 1):
-            dbname = f"{self.cfg['DB_PREFIX']}{i:03d}"
+            dbname = f"{self.cfg['DB_PREFIX']}{i}"
             try:
                 conn = self._get_super_conn(dbname)
                 conn.autocommit = True
@@ -209,10 +215,11 @@ class TSDBManager:
         lock = threading.Lock()
 
         def _worker(req_id):
-            target_db = f"{self.cfg['DB_PREFIX']}{random.randint(1, db_count):03d}"
+            target_db = f"{self.cfg['DB_PREFIX']}{random.randint(1, db_count)}"
             start_time = time.time()
             conn = None
             try:
+                # 压测必须走 PgBouncer
                 conn = self._get_leader_conn(target_db, use_pgbouncer=True, timeout=5)
                 cur = conn.cursor()
                 cur.execute(query)
@@ -260,7 +267,7 @@ class TSDBManager:
         success_count = 0
         
         for i in range(1, db_count + 1):
-            db_name = f"{self.cfg['DB_PREFIX']}{i:03d}"
+            db_name = f"{self.cfg['DB_PREFIX']}{i}"
             try:
                 cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{db_name}' AND pid <> pg_backend_pid();")
                 cursor.execute(f"DROP DATABASE IF EXISTS {db_name};")
@@ -270,16 +277,16 @@ class TSDBManager:
             except Exception as e:
                 print(f"❌ 清理 {db_name} 时发生错误: {e}")
                 
-        # 必须在所有引用了该角色的数据库被删除后，才能安全删除角色
-        try:
-            cursor.execute(f"DROP ROLE IF EXISTS {self.cfg['DB_LEADER']};")
-            print(f"✅ 管理员角色 {self.cfg['DB_LEADER']} 已删除。")
-        except Exception as e:
-            print(f"❌ 删除角色时发生错误: {e}")
+        if self.cfg["DB_LEADER"] != self.cfg["SUPER_USER"]:
+            try:
+                cursor.execute(f"DROP ROLE IF EXISTS {self.cfg['DB_LEADER']};")
+                print(f"✅ 管理员角色 {self.cfg['DB_LEADER']} 已删除。")
+            except Exception as e:
+                print(f"❌ 删除角色时发生错误: {e}")
 
         cursor.close()
         conn.close()
-        print(f"\n[OK] 清理完毕！成功删除了 {success_count} 套库。系统已恢复纯净状态。")
+        print(f"\n[OK] 清理完毕！成功删除了 {success_count} 套库。")
 
 # ================= 交互式菜单 =================
 if __name__ == "__main__":
@@ -320,3 +327,4 @@ if __name__ == "__main__":
             break
         else:
             print("无效输入，请重新选择。")
+

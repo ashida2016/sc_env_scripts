@@ -4,7 +4,7 @@
 ;
 $TTL    604800
 @       IN      SOA     ns1.home.lan. admin.home.lan. (
-                        2026032101         ; Serial
+                        2026032301         ; Serial
                         604800         ; Refresh
                         86400          ; Retry
                         2419200        ; Expire
@@ -23,7 +23,7 @@ kafka           IN      A       192.168.1.80
 nginx           IN      A       192.168.1.66
 asusnote        IN      A       192.168.1.123
 dev2510         IN      A       192.168.1.133
-amp             IN      A       192.168.1.183
+amp             IN      A       192.168.1.66
 web0            IN      A       192.168.1.66
 web1            IN      A       192.168.1.66
 web2            IN      A       192.168.1.66
