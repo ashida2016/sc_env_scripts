@@ -1,0 +1,29 @@
+{
+    "db_admin": {
+        "host": "10.0.133.51",
+        "port": 5432,
+        "user": "scdbadmin",
+        "password": "Dfcf2026^",
+        "dbname": "defaultdb"
+    },
+    "target_db": "scdb",
+    "roles": {
+        "fetcher": {
+            "user": "sc_fetcher",
+            "password": "FetcherPassword123!"
+        },
+        "writer": {
+            "user": "sc_writer",
+            "password": "WriterPassword123!"
+        }
+    },
+    "init_params": {
+        "num_schemas": 50,
+        "max_workers": 10
+    },
+    "test_params": {
+        "mock_days": 30,
+        "stress_concurrency": 20,
+        "stress_queries": 100
+    }
+}
