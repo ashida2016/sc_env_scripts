@@ -224,7 +224,8 @@ class SCDBTester(SCDBBase):
         """简单的读写并发压力测试"""
         concurrency = self.config["test_params"]["stress_concurrency"]
         queries = self.config["test_params"]["stress_queries"]
-        print(f"\n--- 开始压力测试 (并发数: {concurrency}, 总请求: {queries}) ---")
+        avg_days = self.config["test_params"]["sql_avg_days"]
+        print(f"\n--- 开始压力测试 (并发数: {concurrency}, 总请求: {queries}，获取最近 {avg_days} 天平均收盘价) ---")
         
         fetcher_cfg = self.config["roles"]["fetcher"]
         
@@ -234,13 +235,22 @@ class SCDBTester(SCDBBase):
             cursor = conn.cursor()
             try:
                 start = time.time()
-                # 模拟查询：获取某只股票最近 5 天的平均收盘价
+                # 模拟查询：获取某只股票最近 n 天的平均收盘价
                 cursor.execute(f"""
-                    SELECT AVG(close) FROM {schema}.daily_kline 
-                    ORDER BY time DESC LIMIT 5;
+                    SELECT AVG(close) FROM (
+                        SELECT close 
+                            FROM {schema}.daily_kline
+                            ORDER BY time DESC 
+                            LIMIT {avg_days}
+                    ) AS recent_days;
                 """)
-                cursor.fetchone()
-                return time.time() - start
+                result = cursor.fetchone()
+                time_cost = time.time() - start
+                print ( f"查询 {schema} 成功, 最近 {avg_days} 天平均收盘价: {result[0]:.2f}, 耗时: {time_cost:.2f}s" )
+                return time_cost
+            except Exception as e:
+                print(f"查询失败: {e}")
+                return None
             finally:
                 cursor.close()
                 conn.close()
@@ -269,8 +279,8 @@ if __name__ == "__main__":
     cfg = os.path.join(os.getcwd(), "init_pgsql_dbsV2/scdb_config.json")
     
     # 1. 执行初始化
-    initializer = SCDBInitializer(cfg)
-    initializer.run()
+    # initializer = SCDBInitializer(cfg)
+    # initializer.run()
     
     # 2. 执行测试
     tester = SCDBTester(cfg)

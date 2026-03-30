@@ -1,9 +1,9 @@
 {
     "db_admin": {
-        "host": "10.0.133.61",
+        "host": "10.10.10.71",
         "port": 5432,
         "user": "scdbadmin",
-        "password": "Dfcf2026^",
+        "password": "NhyCf2026^",
         "dbname": "scdbpool"
     },
     "target_db": "scdbpool",
@@ -18,12 +18,13 @@
         }
     },
     "init_params": {
-        "num_schemas": 500,
-        "max_workers": 10
+        "num_schemas": 1000,
+        "max_workers": 20
     },
     "test_params": {
         "mock_days": 12500,
         "stress_concurrency": 200,
-        "stress_queries": 1000
+        "stress_queries": 5000,
+        "sql_avg_days": 250
     }
 }
