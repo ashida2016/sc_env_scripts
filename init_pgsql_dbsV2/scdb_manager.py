@@ -1,5 +1,5 @@
 import json
-import time
+import time, os, sys
 import random
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
@@ -9,10 +9,14 @@ from datetime import datetime, timedelta
 class SCDBBase:
     """基础类：负责加载配置和提供连接"""
     def __init__(self, config_path="scdb_config.json"):
-        with open(config_path, 'r', encoding='utf-8') as f:
-            self.config = json.load(f)
-        self.admin_cfg = self.config["db_admin"]
-        self.target_db = self.config["target_db"]
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                self.config = json.load(f)
+            self.admin_cfg = self.config["db_admin"]
+            self.target_db = self.config["target_db"]
+        except Exception as e:
+            print(f"配置加载失败: {e}")
+            sys.exit(1)
 
     def get_connection(self, dbname=None, user=None, password=None):
         """获取数据库连接，支持动态切换数据库和用户"""
@@ -123,6 +127,7 @@ class SCDBInitializer(SCDBBase):
         self.setup_database_and_roles()
         
         # 激活 TimescaleDB 插件
+        # conn = self.get_connection(dbname=self.target_db)
         conn = self.get_connection(dbname=self.target_db)
         cursor = conn.cursor()
         cursor.execute("CREATE EXTENSION IF NOT EXISTS timescaledb;")
@@ -260,12 +265,15 @@ class SCDBTester(SCDBBase):
 
 
 if __name__ == "__main__":
+    # Set config path to current working directory
+    cfg = os.path.join(os.getcwd(), "init_pgsql_dbsV2/scdb_config.json")
+    
     # 1. 执行初始化
-    initializer = SCDBInitializer()
+    initializer = SCDBInitializer(cfg)
     initializer.run()
     
     # 2. 执行测试
-    tester = SCDBTester()
+    tester = SCDBTester(cfg)
     schemas = tester.test_connectivity_and_fetch_tags()
     if schemas:
         tester.simulate_mock_data(schemas)

@@ -1,12 +1,12 @@
 {
     "db_admin": {
-        "host": "10.0.133.51",
+        "host": "10.0.133.61",
         "port": 5432,
         "user": "scdbadmin",
         "password": "Dfcf2026^",
-        "dbname": "defaultdb"
+        "dbname": "scdbpool"
     },
-    "target_db": "scdb",
+    "target_db": "scdbpool",
     "roles": {
         "fetcher": {
             "user": "sc_fetcher",
@@ -18,12 +18,12 @@
         }
     },
     "init_params": {
-        "num_schemas": 50,
+        "num_schemas": 500,
         "max_workers": 10
     },
     "test_params": {
-        "mock_days": 30,
-        "stress_concurrency": 20,
-        "stress_queries": 100
+        "mock_days": 12500,
+        "stress_concurrency": 200,
+        "stress_queries": 1000
     }
 }
