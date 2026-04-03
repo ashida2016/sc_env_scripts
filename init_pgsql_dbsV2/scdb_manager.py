@@ -277,14 +277,21 @@ class SCDBTester(SCDBBase):
 if __name__ == "__main__":
     # Set config path to current working directory
     cfg = os.path.join(os.getcwd(), "init_pgsql_dbsV2/scdb_config.json")
+
+    is_init = False  # 控制是否执行初始化，避免重复创建数据库和 Schema 
+    is_mock = False  # 控制是否执行数据模拟，避免重复写入大量数据
     
     # 1. 执行初始化
-    # initializer = SCDBInitializer(cfg)
-    # initializer.run()
-    
+    if is_init:
+        initializer = SCDBInitializer(cfg)
+        initializer.run()
+    else:
     # 2. 执行测试
-    tester = SCDBTester(cfg)
-    schemas = tester.test_connectivity_and_fetch_tags()
-    if schemas:
-        tester.simulate_mock_data(schemas)
-        tester.run_stress_test(schemas)
+    # Before running the tester, ensure that the initializer has completed successfully 
+    # and users in "roles" section of the config have appropriate permissions.
+        tester = SCDBTester(cfg)
+        schemas = tester.test_connectivity_and_fetch_tags()
+        if schemas:
+            if is_mock:
+                tester.simulate_mock_data(schemas)
+            tester.run_stress_test(schemas)

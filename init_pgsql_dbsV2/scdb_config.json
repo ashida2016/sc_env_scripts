@@ -18,8 +18,8 @@
         }
     },
     "init_params": {
-        "num_schemas": 1000,
-        "max_workers": 20
+        "num_schemas": 6000,
+        "max_workers": 16
     },
     "test_params": {
         "mock_days": 12500,
